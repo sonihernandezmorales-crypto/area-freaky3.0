@@ -11,7 +11,7 @@ type MediaItem = {
   views: number;
 };
 
-const API_URL = "http://169.58.72.43:5000";
+const API_URL = "https://169-58-72-43.sslip.io";
 
 function App() {
 
