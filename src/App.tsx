@@ -18,6 +18,7 @@ function App() {
   const [photos, setPhotos] = useState<MediaItem[]>([]);
   const [videos, setVideos] = useState<MediaItem[]>([]);
   const [viewer, setViewer] = useState<{ type: "photo" | "video"; url: string; id: string } | null>(null);
+  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [isAdmin, setIsAdmin] = useState(false);
   const [clickCount, setClickCount] = useState(0);
   const [pendingFile, setPendingFile] = useState<{ file: File } | null>(null);
@@ -112,11 +113,25 @@ function App() {
   };
 
   const likeMedia = async (id: string) => {
+  const alreadyLiked = likedIds.has(id);
+  const endpoint = alreadyLiked ? "unlike" : "like";
+
   try {
-    await fetch(`${API_URL}/api/media/${id}/like`, { method: "POST" });
+    await fetch(`${API_URL}/api/media/${id}/${endpoint}`, { method: "POST" });
+
+    setLikedIds((prev) => {
+      const next = new Set(prev);
+      if (alreadyLiked) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+
     loadMedia();
   } catch (err) {
-    console.error("Error dando like:", err);
+    console.error("Error con el like:", err);
   }
 };
 
@@ -346,13 +361,7 @@ function App() {
               alt="gran vista"
             />
           ) : (
-            <video
-  src={viewer.url}
-  autoPlay
-  playsInline
-  controls
-/>
-)}
+            
 
           {isAdmin && (
             <button
