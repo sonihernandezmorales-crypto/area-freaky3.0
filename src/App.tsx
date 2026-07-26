@@ -332,11 +332,11 @@ function App() {
             />
           ) : (
             <video
-              src={viewer.url}
-              autoPlay
-              playsInline
-            />
-          )}
+  src={viewer.url}
+  autoPlay
+  playsInline
+  controls
+/>
 
           {isAdmin && (
             <button
