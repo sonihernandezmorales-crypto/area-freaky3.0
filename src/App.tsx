@@ -387,6 +387,7 @@ const goToPrev = () => {
             />
           ) : (
             <video
+              key={viewer.id}
               src={viewer.url}
               autoPlay
               playsInline
