@@ -38,7 +38,7 @@ function App() {
 const loadPhotos = async (append: boolean) => {
   try {
     const offset = append ? photos.length : 0;
-    const res = await fetch(`${API_URL}/api/media?type=photo&limit=${PAGE_SIZE}&offset=${offset}`);
+    const res = await fetch(`${API_URL}/api/media?type=photo&limit=100000&offset=${offset}`);
     const data: MediaItem[] = await res.json();
     const withUrls = data.map((m) => ({ ...m, url: API_URL + m.url }));
     setPhotos(append ? [...photos, ...withUrls] : withUrls);
