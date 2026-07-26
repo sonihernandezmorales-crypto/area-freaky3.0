@@ -9,6 +9,7 @@ type MediaItem = {
   description: string;
   date: string;
   views: number;
+  thumbnail?: string;
 };
 
 const API_URL = "https://169-58-72-43.sslip.io";
@@ -344,6 +345,7 @@ const goToPrev = () => {
     <video
       src={video.url}
       controls
+      poster={video.thumbnail ? API_URL + video.thumbnail : undefined}
       onClick={() => openViewer("video", video.url, video.id, index)}
     />
 
