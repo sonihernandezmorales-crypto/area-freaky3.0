@@ -402,18 +402,16 @@ const goToPrev = () => {
 </button>
 
 {isAdmin && (
-  
-          {isAdmin && (
-            <button
-              className="deleteButton"
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteMedia(viewer.id);
-              }}
-            >
-              Eliminar
-            </button>
-          )}
+  <button
+    className="deleteButton"
+    onClick={(e) => {
+      e.stopPropagation();
+      deleteMedia(viewer.id);
+    }}
+  >
+    Eliminar
+  </button>
+)}
 
         </div>
 
