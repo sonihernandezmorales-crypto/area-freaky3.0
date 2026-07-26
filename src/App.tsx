@@ -17,7 +17,7 @@ function App() {
 
   const [photos, setPhotos] = useState<MediaItem[]>([]);
   const [videos, setVideos] = useState<MediaItem[]>([]);
-  const [viewer, setViewer] = useState<{ type: "photo" | "video"; url: string; id: string } | null>(null);
+  const [viewer, setViewer] = useState<{ type: "photo" | "video"; url: string; id: string; index: number } | null>(null);
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [isAdmin, setIsAdmin] = useState(false);
   const [clickCount, setClickCount] = useState(0);
@@ -135,10 +135,28 @@ function App() {
   }
 };
 
-  const openViewer = (type: "photo" | "video", url: string, id: string) => {
-    setViewer({ type, url, id });
-    registerView(id);
-  };
+  const openViewer = (type: "photo" | "video", url: string, id: string, index: number) => {
+  setViewer({ type, url, id, index });
+  registerView(id);
+};
+
+const goToNext = () => {
+  if (!viewer) return;
+  const list = viewer.type === "photo" ? photos : videos;
+  const nextIndex = (viewer.index + 1) % list.length;
+  const next = list[nextIndex];
+  setViewer({ type: viewer.type, url: next.url, id: next.id, index: nextIndex });
+  registerView(next.id);
+};
+
+const goToPrev = () => {
+  if (!viewer) return;
+  const list = viewer.type === "photo" ? photos : videos;
+  const prevIndex = (viewer.index - 1 + list.length) % list.length;
+  const prev = list[prevIndex];
+  setViewer({ type: viewer.type, url: prev.url, id: prev.id, index: prevIndex });
+  registerView(prev.id);
+};
 
   const uploadFile = async (file: File, description: string) => {
     if (isUploading) return;
@@ -292,15 +310,15 @@ function App() {
 
         <div className="photoCarousel">
 
-          {photos.map((photo)=>(
+          {photos.map((photo, index)=>(
 
-            <div key={photo.id} className="photoCard">
+  <div key={photo.id} className="photoCard">
 
-              <img
-                src={photo.url}
-                alt="foto"
-                onClick={() => openViewer("photo", photo.url, photo.id)}
-              />
+    <img
+      src={photo.url}
+      alt="foto"
+      onClick={() => openViewer("photo", photo.url, photo.id, index)}
+    />
 
               <p className="photoStats">
                 {photo.date} · {photo.views} vistas
@@ -319,15 +337,15 @@ function App() {
 
       <div className="videoSection">
 
-        {videos.map((video)=>(
+        {videos.map((video, index)=>(
 
-          <div key={video.id} className="videoCard">
+  <div key={video.id} className="videoCard">
 
-            <video
-  src={video.url}
-  controls
-  onClick={() => openViewer("video", video.url, video.id)}
-/>
+    <video
+      src={video.url}
+      controls
+      onClick={() => openViewer("video", video.url, video.id, index)}
+    />
 
             <p className="videoMeta">
   {video.description && <span className="videoDescription">{video.description}</span>}
@@ -350,12 +368,19 @@ function App() {
 
       {viewer && (
 
-        <div
-          className="viewer"
-          onClick={() => setViewer(null)}
-        >
+  <div
+    className="viewer"
+    onClick={() => setViewer(null)}
+  >
 
-          {viewer.type === "photo" ? (
+    <button
+      className="navButton navLeft"
+      onClick={(e) => { e.stopPropagation(); goToPrev(); }}
+    >
+      ‹
+    </button>
+
+    {viewer.type === "photo" ? (
             <img
               src={viewer.url}
               alt="gran vista"
@@ -369,6 +394,15 @@ function App() {
             />
           )}
             
+            <button
+  className="navButton navRight"
+  onClick={(e) => { e.stopPropagation(); goToNext(); }}
+>
+  ›
+</button>
+
+{isAdmin && (
+  
           {isAdmin && (
             <button
               className="deleteButton"
