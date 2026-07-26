@@ -33,17 +33,36 @@ function App() {
   const photoInput = useRef<HTMLInputElement>(null);
   const videoInput = useRef<HTMLInputElement>(null);
 
-  const loadMedia = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/media`);
-      const data: MediaItem[] = await res.json();
+  const PAGE_SIZE = 15;
 
-      setPhotos(data.filter((m) => m.type === "photo").map((m) => ({ ...m, url: API_URL + m.url })));
-      setVideos(data.filter((m) => m.type === "video").map((m) => ({ ...m, url: API_URL + m.url })));
-    } catch (err) {
-      console.error("Error cargando contenido:", err);
-    }
-  };
+const loadPhotos = async (append: boolean) => {
+  try {
+    const offset = append ? photos.length : 0;
+    const res = await fetch(`${API_URL}/api/media?type=photo&limit=${PAGE_SIZE}&offset=${offset}`);
+    const data: MediaItem[] = await res.json();
+    const withUrls = data.map((m) => ({ ...m, url: API_URL + m.url }));
+    setPhotos(append ? [...photos, ...withUrls] : withUrls);
+  } catch (err) {
+    console.error("Error cargando fotos:", err);
+  }
+};
+
+const loadVideos = async (append: boolean) => {
+  try {
+    const offset = append ? videos.length : 0;
+    const res = await fetch(`${API_URL}/api/media?type=video&limit=${PAGE_SIZE}&offset=${offset}`);
+    const data: MediaItem[] = await res.json();
+    const withUrls = data.map((m) => ({ ...m, url: API_URL + m.url }));
+    setVideos(append ? [...videos, ...withUrls] : withUrls);
+  } catch (err) {
+    console.error("Error cargando videos:", err);
+  }
+};
+
+const loadMedia = () => {
+  loadPhotos(false);
+  loadVideos(false);
+};
 
   const loadEntries = async () => {
     try {
@@ -364,9 +383,11 @@ const goToPrev = () => {
 
         ))}
 
+        <button onClick={() => loadVideos(true)} className="loadMoreButton">
+          Ver más videos
+        </button>
+
       </div>
-
-
 
       {viewer && (
 

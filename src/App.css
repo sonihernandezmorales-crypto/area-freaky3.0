@@ -372,3 +372,14 @@ button{
 .navRight{
   right:10px;
 }
+
+.loadMoreButton{
+  background:black;
+  color:#ff00ff;
+  border:2px solid #ff00ff;
+  border-radius:10px;
+  padding:12px;
+  margin-top:12px;
+  font-size:14px;
+  grid-column:1 / -1;
+}
