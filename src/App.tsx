@@ -323,11 +323,14 @@ function App() {
 
           <div key={video.id} className="videoCard">
 
+            ) : (
             <video
-              src={video.url}
+              src={viewer.url}
+              autoPlay
+              playsInline
               controls
-              onClick={() => openViewer("video", video.url, video.id)}
             />
+          )}
 
             <p className="videoMeta">
   {video.description && <span className="videoDescription">{video.description}</span>}
