@@ -300,10 +300,12 @@ function App() {
           <div key={video.id} className="videoCard">
 
             <video
-              src={video.url}
-              controls
-              onClick={() => openViewer("video", video.url, video.id)}
-            />
+  src={video.url}
+  controls
+  preload="metadata"
+  onClick={() => openViewer("video", video.url, video.id)}
+  onPlay={() => registerView(video.id)}
+/>
 
             <p className="videoMeta">
               {video.description && <span className="videoDescription">{video.description}</span>}
