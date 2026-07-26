@@ -111,6 +111,15 @@ function App() {
     }
   };
 
+  const likeMedia = async (id: string) => {
+  try {
+    await fetch(`${API_URL}/api/media/${id}/like`, { method: "POST" });
+    loadMedia();
+  } catch (err) {
+    console.error("Error dando like:", err);
+  }
+};
+
   const openViewer = (type: "photo" | "video", url: string, id: string) => {
     setViewer({ type, url, id });
     registerView(id);
@@ -306,9 +315,15 @@ function App() {
             />
 
             <p className="videoMeta">
-              {video.description && <span className="videoDescription">{video.description}</span>}
-              <span className="videoStats">{video.date} · {video.views} vistas</span>
-            </p>
+  {video.description && <span className="videoDescription">{video.description}</span>}
+  <span className="videoStats">{video.date} · {video.views} vistas</span>
+  <button
+    className="likeButton"
+    onClick={(e) => { e.stopPropagation(); likeMedia(video.id); }}
+  >
+    ❤️ {(video as any).likes || 0}
+  </button>
+</p>
 
           </div>
 
