@@ -352,6 +352,7 @@ function App() {
   playsInline
   controls
 />
+)}
 
           {isAdmin && (
             <button
