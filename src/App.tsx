@@ -323,14 +323,11 @@ function App() {
 
           <div key={video.id} className="videoCard">
 
-            ) : (
             <video
-              src={viewer.url}
-              autoPlay
-              playsInline
-              controls
-            />
-          )}
+  src={video.url}
+  controls
+  onClick={() => openViewer("video", video.url, video.id)}
+/>
 
             <p className="videoMeta">
   {video.description && <span className="videoDescription">{video.description}</span>}
@@ -364,8 +361,14 @@ function App() {
               alt="gran vista"
             />
           ) : (
+            <video
+              src={viewer.url}
+              autoPlay
+              playsInline
+              controls
+            />
+          )}
             
-
           {isAdmin && (
             <button
               className="deleteButton"
