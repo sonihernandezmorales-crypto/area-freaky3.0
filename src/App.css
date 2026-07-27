@@ -98,14 +98,30 @@ button{
 }
 
 /* PANTALLA COMPLETA */
-/* Esto es solo para que el video no se estire de más y conserve su resolución */
+/* PANTALLA COMPLETA / VIEWER GLOBAL */
+.viewer{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;   /* Ocupa el 100% del ancho real de la pantalla */
+  height: 100vh;  /* Ocupa el 100% del alto real de la pantalla */
+  background: rgba(0, 0, 0, 0.95); /* Fondo negro cine */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* El video dentro de la pantalla completa (Laptop y Celular) */
 .viewer video{
   width: auto;
   height: auto;
-  max-width: 85vw;
-  max-height: 70vh;
-  object-fit: contain;
-  border-radius: 12px;
+  max-width: 100%;   /* Se estira de forma inteligente al ancho máximo de la pantalla */
+  max-height: 100%;  /* Se estira de forma inteligente al alto máximo de la pantalla */
+  object-fit: contain; /* Clave: Mantiene la proporción exacta, si es horizontal o vertical se acopla sin deformarse */
+  border-radius: 8px;
 }
 
 .viewer img{
