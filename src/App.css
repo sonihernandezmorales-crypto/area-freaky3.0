@@ -374,12 +374,15 @@ button{
 }
 
 .loadMoreButton{
-  background:black;
-  color:#ff00ff;
+  background:#ff00ff;
+  color:black;
   border:2px solid #ff00ff;
   border-radius:10px;
-  padding:12px;
-  margin-top:12px;
-  font-size:14px;
+  padding:14px;
+  margin:16px auto;
+  font-size:16px;
+  font-weight:bold;
   grid-column:1 / -1;
+  width:90%;
+  display:block;
 }
