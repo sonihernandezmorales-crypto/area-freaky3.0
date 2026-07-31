@@ -413,7 +413,8 @@ const goToPrev = () => {
               src={viewer.url}
               autoPlay
               playsInline
-              muted
+              controls
+              style={{ width: "100%", maxHeight: "80vh", objectFit: "contain" }}
             />
           )}
             
