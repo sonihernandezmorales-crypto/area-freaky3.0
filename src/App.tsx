@@ -390,10 +390,29 @@ const goToPrev = () => {
 
       {viewer && (
 
+  {viewer && (
+
   <div
     className="viewer"
     onClick={() => setViewer(null)}
   >
+    {/* Botón X para cerrar el visor de forma segura */}
+    <button
+      className="closeViewerButton"
+      onClick={(e) => {
+        e.stopPropagation();
+        setViewer(null);
+      }}
+    >
+      ✕
+    </button>
+
+    <button
+      className="navButton navLeft"
+      onClick={(e) => { e.stopPropagation(); goToPrev(); }}
+    >
+      ‹
+    </button>
 
     <button
       className="navButton navLeft"
