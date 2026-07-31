@@ -388,8 +388,6 @@ const goToPrev = () => {
 
       </div>
 
-      {viewer && (
-
   {viewer && (
 
   <div
