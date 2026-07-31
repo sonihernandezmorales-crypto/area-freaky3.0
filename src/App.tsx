@@ -363,7 +363,6 @@ const goToPrev = () => {
 
     <video
       src={video.url}
-      controls
       poster={video.thumbnail ? API_URL + video.thumbnail : undefined}
       onClick={() => openViewer("video", video.url, video.id, index)}
     />
@@ -414,7 +413,7 @@ const goToPrev = () => {
               src={viewer.url}
               autoPlay
               playsInline
-              controls
+              muted
             />
           )}
             
