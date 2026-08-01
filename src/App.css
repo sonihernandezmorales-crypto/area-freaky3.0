@@ -91,10 +91,11 @@ button{
 
 .videoSection video{
   width: 100%;
-  max-width: 200px; /* Un poco más compactos para que entren bien de 3 en 3 (o 4 en 4) */
-  height: 280px;
-  object-fit: cover;
+  max-width: 150px;
+  height: 200px;
+  object-fit: contain; /* Cambia cover por contain */
   border-radius: 12px;
+  background: #111;    /* Opcional: un fondo oscuro por si el video deja barras a los lados */
 }
 
 .closeViewerButton {
