@@ -16,7 +16,6 @@ const API_URL = "https://169-58-72-43.sslip.io";
 
 function App() {
 
-  const [photos, setPhotos] = useState<MediaItem[]>([]);
   const [videos, setVideos] = useState<MediaItem[]>([]);
   const [viewer, setViewer] = useState<{ type: "photo" | "video"; url: string; id: string; index: number } | null>(null);
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
@@ -30,22 +29,9 @@ function App() {
   const [passwordInput, setPasswordInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
-  const photoInput = useRef<HTMLInputElement>(null);
   const videoInput = useRef<HTMLInputElement>(null);
 
   const PAGE_SIZE = 15;
-
-const loadPhotos = async (append: boolean) => {
-  try {
-    const offset = append ? photos.length : 0;
-    const res = await fetch(`${API_URL}/api/media?type=photo&limit=100000&offset=${offset}`);
-    const data: MediaItem[] = await res.json();
-    const withUrls = data.map((m) => ({ ...m, url: API_URL + m.url }));
-    setPhotos(append ? [...photos, ...withUrls] : withUrls);
-  } catch (err) {
-    console.error("Error cargando fotos:", err);
-  }
-};
 
 const loadVideos = async (append: boolean) => {
   try {
@@ -60,7 +46,6 @@ const loadVideos = async (append: boolean) => {
 };
 
 const loadMedia = () => {
-  loadPhotos(false);
   loadVideos(false);
 };
 
@@ -162,7 +147,7 @@ const loadMedia = () => {
 
 const goToNext = () => {
   if (!viewer) return;
-  const list = viewer.type === "photo" ? photos : videos;
+  const list = videos;
   const nextIndex = (viewer.index + 1) % list.length;
   const next = list[nextIndex];
   setViewer({ type: viewer.type, url: next.url, id: next.id, index: nextIndex });
@@ -171,7 +156,7 @@ const goToNext = () => {
 
 const goToPrev = () => {
   if (!viewer) return;
-  const list = viewer.type === "photo" ? photos : videos;
+  const list = videos;
   const prevIndex = (viewer.index - 1 + list.length) % list.length;
   const prev = list[prevIndex];
   setViewer({ type: viewer.type, url: prev.url, id: prev.id, index: prevIndex });
@@ -208,18 +193,14 @@ const goToPrev = () => {
     }
   };
 
-  const handleFileSelected = (e: ChangeEvent<HTMLInputElement>, kind: "photo" | "video") => {
+  const handleFileSelected = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     if (isUploading) return;
     const file = e.target.files[0];
     e.target.value = "";
 
-    if (kind === "photo") {
-      uploadFile(file, "");
-    } else {
-      setPendingFile({ file });
-      setDescriptionInput("");
-    }
+    setPendingFile({ file });
+    setDescriptionInput("");
   };
 
   const confirmUpload = async () => {
@@ -295,88 +276,44 @@ const goToPrev = () => {
         <>
           <div className="buttons">
 
-            <button onClick={() => photoInput.current?.click()} disabled={isUploading}>
-              {isUploading ? "Subiendo..." : "Subir fotos"}
-            </button>
-
             <button onClick={() => videoInput.current?.click()} disabled={isUploading}>
               {isUploading ? "Subiendo..." : "Subir videos"}
             </button>
 
           </div>
 
-
-          <input
-            ref={photoInput}
-            type="file"
-            accept="image/*"
-            hidden
-            onChange={(e) => handleFileSelected(e, "photo")}
-          />
-
-
           <input
             ref={videoInput}
             type="file"
             accept="video/*"
             hidden
-            onChange={(e) => handleFileSelected(e, "video")}
+            onChange={(e) => handleFileSelected(e)}
           />
         </>
       )}
-
-
-      <div className="photoSection">
-
-        <div className="photoCarousel">
-
-          {photos.map((photo, index)=>(
-
-  <div key={photo.id} className="photoCard">
-
-    <img
-      src={photo.url}
-      alt="foto"
-      onClick={() => openViewer("photo", photo.url, photo.id, index)}
-    />
-
-              <p className="photoStats">
-                {photo.date} · {photo.views} vistas
-              </p>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      </div>
-
-
-
 
       <div className="videoSection">
 
         {videos.map((video, index)=>(
 
-  <div key={video.id} className="videoCard">
+          <div key={video.id} className="videoCard">
 
-    <video
-      src={video.url}
-      poster={video.thumbnail ? API_URL + video.thumbnail : undefined}
-      onClick={() => openViewer("video", video.url, video.id, index)}
-    />
+            <video
+              src={video.url}
+              poster={video.thumbnail ? API_URL + video.thumbnail : undefined}
+              onClick={() => openViewer("video", video.url, video.id, index)}
+            />
 
             <p className="videoMeta">
-  {video.description && <span className="videoDescription">{video.description}</span>}
-  <span className="videoStats">{video.date} · {video.views} vistas</span>
-  <button
-    className="likeButton"
-    onClick={(e) => { e.stopPropagation(); likeMedia(video.id); }}
-  >
-    ❤️ {(video as any).likes || 0}
-  </button>
-</p>
+              {video.description && <span className="videoDescription">{video.description}</span>}
+              <span className="videoStats">{video.date} · {video.views} vistas</span>
+              <button
+                className="likeButton"
+                onClick={(e) => { e.stopPropagation(); likeMedia(video.id); }}
+              >
+                ❤️ {(video as any).likes || 0}
+              </button>
+            </p>
 
           </div>
 
@@ -394,7 +331,6 @@ const goToPrev = () => {
     className="viewer"
     onClick={() => setViewer(null)}
   >
-    {/* Botón X para cerrar el visor de forma segura */}
     <button
       className="closeViewerButton"
       onClick={(e) => {
@@ -403,13 +339,6 @@ const goToPrev = () => {
       }}
     >
       ✕
-    </button>
-
-    <button
-      className="navButton navLeft"
-      onClick={(e) => { e.stopPropagation(); goToPrev(); }}
-    >
-      ‹
     </button>
 
     <button
@@ -435,24 +364,24 @@ const goToPrev = () => {
             />
           )}
             
-            <button
-  className="navButton navRight"
-  onClick={(e) => { e.stopPropagation(); goToNext(); }}
->
-  ›
-</button>
+    <button
+      className="navButton navRight"
+      onClick={(e) => { e.stopPropagation(); goToNext(); }}
+    >
+      ›
+    </button>
 
-{isAdmin && (
-  <button
-    className="deleteButton"
-    onClick={(e) => {
-      e.stopPropagation();
-      deleteMedia(viewer.id);
-    }}
-  >
-    Eliminar
-  </button>
-)}
+    {isAdmin && (
+      <button
+        className="deleteButton"
+        onClick={(e) => {
+          e.stopPropagation();
+          deleteMedia(viewer.id);
+        }}
+      >
+        Eliminar
+      </button>
+    )}
 
         </div>
 
@@ -516,11 +445,9 @@ const goToPrev = () => {
 
       )}
 
-
     </div>
 
   );
 }
-
 
 export default App;
