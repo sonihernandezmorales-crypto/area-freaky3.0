@@ -14,6 +14,8 @@ type MediaItem = {
 
 const API_URL = "https://169-58-72-43.sslip.io";
 
+const AD_EVERY_N_VIDEOS = 4;
+
 function App() {
 
   const [videos, setVideos] = useState<MediaItem[]>([]);
@@ -33,21 +35,21 @@ function App() {
 
   const PAGE_SIZE = 15;
 
-const loadVideos = async (append: boolean) => {
-  try {
-    const offset = append ? videos.length : 0;
-    const res = await fetch(`${API_URL}/api/media?type=video&limit=${PAGE_SIZE}&offset=${offset}`);
-    const data: MediaItem[] = await res.json();
-    const withUrls = data.map((m) => ({ ...m, url: API_URL + m.url }));
-    setVideos(append ? [...videos, ...withUrls] : withUrls);
-  } catch (err) {
-    console.error("Error cargando videos:", err);
-  }
-};
+  const loadVideos = async (append: boolean) => {
+    try {
+      const offset = append ? videos.length : 0;
+      const res = await fetch(`${API_URL}/api/media?type=video&limit=${PAGE_SIZE}&offset=${offset}`);
+      const data: MediaItem[] = await res.json();
+      const withUrls = data.map((m) => ({ ...m, url: API_URL + m.url }));
+      setVideos(append ? [...videos, ...withUrls] : withUrls);
+    } catch (err) {
+      console.error("Error cargando videos:", err);
+    }
+  };
 
-const loadMedia = () => {
-  loadVideos(false);
-};
+  const loadMedia = () => {
+    loadVideos(false);
+  };
 
   const loadEntries = async () => {
     try {
@@ -118,50 +120,50 @@ const loadMedia = () => {
   };
 
   const likeMedia = async (id: string) => {
-  const alreadyLiked = likedIds.has(id);
-  const endpoint = alreadyLiked ? "unlike" : "like";
+    const alreadyLiked = likedIds.has(id);
+    const endpoint = alreadyLiked ? "unlike" : "like";
 
-  try {
-    await fetch(`${API_URL}/api/media/${id}/${endpoint}`, { method: "POST" });
+    try {
+      await fetch(`${API_URL}/api/media/${id}/${endpoint}`, { method: "POST" });
 
-    setLikedIds((prev) => {
-      const next = new Set(prev);
-      if (alreadyLiked) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
+      setLikedIds((prev) => {
+        const next = new Set(prev);
+        if (alreadyLiked) {
+          next.delete(id);
+        } else {
+          next.add(id);
+        }
+        return next;
+      });
 
-    loadMedia();
-  } catch (err) {
-    console.error("Error con el like:", err);
-  }
-};
+      loadMedia();
+    } catch (err) {
+      console.error("Error con el like:", err);
+    }
+  };
 
   const openViewer = (type: "photo" | "video", url: string, id: string, index: number) => {
-  setViewer({ type, url, id, index });
-  registerView(id);
-};
+    setViewer({ type, url, id, index });
+    registerView(id);
+  };
 
-const goToNext = () => {
-  if (!viewer) return;
-  const list = videos;
-  const nextIndex = (viewer.index + 1) % list.length;
-  const next = list[nextIndex];
-  setViewer({ type: viewer.type, url: next.url, id: next.id, index: nextIndex });
-  registerView(next.id);
-};
+  const goToNext = () => {
+    if (!viewer) return;
+    const list = videos;
+    const nextIndex = (viewer.index + 1) % list.length;
+    const next = list[nextIndex];
+    setViewer({ type: viewer.type, url: next.url, id: next.id, index: nextIndex });
+    registerView(next.id);
+  };
 
-const goToPrev = () => {
-  if (!viewer) return;
-  const list = videos;
-  const prevIndex = (viewer.index - 1 + list.length) % list.length;
-  const prev = list[prevIndex];
-  setViewer({ type: viewer.type, url: prev.url, id: prev.id, index: prevIndex });
-  registerView(prev.id);
-};
+  const goToPrev = () => {
+    if (!viewer) return;
+    const list = videos;
+    const prevIndex = (viewer.index - 1 + list.length) % list.length;
+    const prev = list[prevIndex];
+    setViewer({ type: viewer.type, url: prev.url, id: prev.id, index: prevIndex });
+    registerView(prev.id);
+  };
 
   const uploadFile = async (file: File, description: string) => {
     if (isUploading) return;
@@ -255,16 +257,19 @@ const goToPrev = () => {
   }
 
   return (
-
     <div className="app">
 
-      <h1 onClick={handleTitleClick}>
-        Ares Freaky 3.0 {isAdmin && "🔓"}
+      <h1 onClick={handleTitleClick} className="appTitle">
+        🔥 Ares Freaky 3.0 🔥 {isAdmin && "🔓"}
       </h1>
 
       <p className="subtitle">
         Un mundo sin límites
       </p>
+
+      <div className="adBanner">
+        <span>Anuncio</span>
+      </div>
 
       {isAdmin && (
         <p className="entriesCounter">
@@ -275,11 +280,9 @@ const goToPrev = () => {
       {isAdmin && (
         <>
           <div className="buttons">
-
             <button onClick={() => videoInput.current?.click()} disabled={isUploading}>
               {isUploading ? "Subiendo..." : "Subir videos"}
             </button>
-
           </div>
 
           <input
@@ -293,65 +296,85 @@ const goToPrev = () => {
       )}
 
       <div className="videoSection">
+        {videos.map((video, index) => (
+          <div key={video.id} className="videoCardWrapper">
+            <div className="videoCard">
+              <video
+                src={video.url}
+                poster={video.thumbnail ? API_URL + video.thumbnail : undefined}
+                onClick={() => openViewer("video", video.url, video.id, index)}
+              />
 
-        {videos.map((video, index)=>(
+              <p className="videoMeta">
+                {video.description && <span className="videoDescription">{video.description}</span>}
+                <span className="videoStats">{video.date} · {video.views} vistas</span>
+                <button
+                  className="likeButton"
+                  onClick={(e) => { e.stopPropagation(); likeMedia(video.id); }}
+                >
+                  ❤️ {(video as any).likes || 0}
+                </button>
+              </p>
+            </div>
 
-          <div key={video.id} className="videoCard">
-
-            <video
-              src={video.url}
-              poster={video.thumbnail ? API_URL + video.thumbnail : undefined}
-              onClick={() => openViewer("video", video.url, video.id, index)}
-            />
-
-            <p className="videoMeta">
-              {video.description && <span className="videoDescription">{video.description}</span>}
-              <span className="videoStats">{video.date} · {video.views} vistas</span>
-              <button
-                className="likeButton"
-                onClick={(e) => { e.stopPropagation(); likeMedia(video.id); }}
-              >
-                ❤️ {(video as any).likes || 0}
-              </button>
-            </p>
-
+            {(index + 1) % AD_EVERY_N_VIDEOS === 0 && (
+              <div className="adBanner adBannerInline">
+                <span>Anuncio</span>
+              </div>
+            )}
           </div>
-
         ))}
 
         <button onClick={() => loadVideos(true)} className="loadMoreButton">
           Ver más videos
         </button>
-
       </div>
 
-  {viewer && (
+      {viewer && (
+        <div className="viewer" onClick={() => setViewer(null)}>
 
-  <div
-    className="viewer"
-    onClick={() => setViewer(null)}
-  >
-    <button
-      className="closeViewerButton"
-      onClick={(e) => {
-        e.stopPropagation();
-        setViewer(null);
-      }}
-    >
-      ✕
-    </button>
+          {/* Botón de cerrar (X) en la esquina */}
+          <button
+            className="closeButton"
+            onClick={() => setViewer(null)}
+            style={{
+              position: "fixed",
+              top: "70px",
+              right: "15px",
+              background: "rgba(0, 0, 0, 0.6)",
+              color: "white",
+              border: "1px solid rgba(255, 255, 255, 0.5)",
+              borderRadius: "50%",
+              width: "32px",
+              height: "32px",
+              fontSize: "16px",
+              fontWeight: "normal",
+              cursor: "pointer",
+              zIndex: 999999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            ✕
+          </button>
 
-    <button
-      className="navButton navLeft"
-      onClick={(e) => { e.stopPropagation(); goToPrev(); }}
-    >
-      ‹
-    </button>
+          <div className="viewerAdBar" onClick={(e) => e.stopPropagation()}>
+            <span>Anuncio</span>
+          </div>
 
-    {viewer.type === "photo" ? (
+          <button
+            className="navButton navLeft"
+            onClick={(e) => { e.stopPropagation(); goToPrev(); }}
+          >
+            ‹
+          </button>
+
+          {viewer.type === "photo" ? (
             <img
               src={viewer.url}
               alt="gran vista"
+              onClick={(e) => e.stopPropagation()}
             />
           ) : (
             <video
@@ -361,39 +384,35 @@ const goToPrev = () => {
               playsInline
               controls
               style={{ width: "100%", maxHeight: "80vh", objectFit: "contain" }}
+              onClick={(e) => e.stopPropagation()}
             />
           )}
             
-    <button
-      className="navButton navRight"
-      onClick={(e) => { e.stopPropagation(); goToNext(); }}
-    >
-      ›
-    </button>
+          <button
+            className="navButton navRight"
+            onClick={(e) => { e.stopPropagation(); goToNext(); }}
+          >
+            ›
+          </button>
 
-    {isAdmin && (
-      <button
-        className="deleteButton"
-        onClick={(e) => {
-          e.stopPropagation();
-          deleteMedia(viewer.id);
-        }}
-      >
-        Eliminar
-      </button>
-    )}
+          {isAdmin && (
+            <button
+              className="deleteButton"
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteMedia(viewer.id);
+              }}
+            >
+              Eliminar
+            </button>
+          )}
 
         </div>
-
       )}
 
-
       {pendingFile && (
-
         <div className="uploadModal" onClick={cancelUpload}>
-
           <div className="uploadModalContent" onClick={(e) => e.stopPropagation()}>
-
             <p>Descripción (opcional):</p>
 
             <textarea
@@ -409,20 +428,13 @@ const goToPrev = () => {
               </button>
               <button onClick={cancelUpload} disabled={isUploading}>Cancelar</button>
             </div>
-
           </div>
-
         </div>
-
       )}
 
-
       {showPasswordModal && (
-
         <div className="uploadModal" onClick={cancelPasswordModal}>
-
           <div className="uploadModalContent" onClick={(e) => e.stopPropagation()}>
-
             <p>Contraseña de administrador:</p>
 
             <input
@@ -438,15 +450,11 @@ const goToPrev = () => {
               <button onClick={verifyAdminPassword}>Entrar</button>
               <button onClick={cancelPasswordModal}>Cancelar</button>
             </div>
-
           </div>
-
         </div>
-
       )}
 
     </div>
-
   );
 }
 

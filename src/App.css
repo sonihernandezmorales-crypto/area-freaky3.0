@@ -19,21 +19,21 @@ body,
   flex-direction:column;
   background:black;
   color:#ff00ff;
-  padding:15px;
+  padding: 8px 15px 15px;
 }
 
-h1{
+.appTitle {
   text-align:center;
-  margin:5px 0;
+  margin: 2px 0 0;
   color:#ff00ff;
-  font-size:32px;
+  font-size: 1.1rem;
 }
 
 .subtitle{
   text-align:center;
   color:#ff00ff;
-  margin:0 0 15px;
-  font-size:18px;
+  margin: 0 0 8px;
+  font-size: 0.85rem;
 }
 
 .buttons{
@@ -52,7 +52,7 @@ button{
   font-size:16px;
 }
 
-/* FOTOS (Ajustadas ligeramente más grandes en formato vertical) */
+/* FOTOS */
 .photoSection{
   height:160px;
   flex-shrink:0;
@@ -74,57 +74,118 @@ button{
   flex-shrink:0;
 }
 
-/* VIDEOS (Ajustados más grandes en formato tipo reel vertical) */
-/* VIDEOS (Ahora en fila horizontal estilo carrusel) */
-/* VIDEOS (Fijados a 3 o 4 por fila para que no se vea vacío) */
-.videoSection{
-  flex: 1;
-  overflow-y: auto;
-  margin-top: 15px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Cambia el 3 por 4 si quieres que sean cuatro por fila */
-  gap: 12px;
-  justify-items: center;
-  align-content: start;
-  padding-bottom: 20px;
-}
-
-.videoSection video{
+/* ANUNCIO - más grande, tamaño tipo banner rectangular */
+.adBanner {
   width: 100%;
-  max-width: 150px;
-  height: 200px;
-  object-fit: contain; /* Cambia cover por contain */
-  border-radius: 12px;
-  background: #111;    /* Opcional: un fondo oscuro por si el video deja barras a los lados */
-}
-
-.closeViewerButton {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  border: 2px solid white;
-  border-radius: 50%;
-  width: 45px;
-  height: 45px;
-  font-size: 24px;
-  cursor: pointer;
-  z-index: 1000;
+  max-width: 320px;
+  min-height: 130px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #1a1a1a;
+  border: 1px dashed #555;
+  color: #888;
+  margin: 8px auto;
+  font-size: 0.9rem;
+  border-radius: 8px;
 }
 
-/* PANTALLA COMPLETA */
+/* VIDEOS - una sola columna, con scroll propio */
+.videoSection {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 20px;
+}
+
+.videoCardWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.videoCard{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.videoCard video {
+  width: 100%;
+  max-width: 92%;
+  margin: 0 auto;
+  height: 320px;
+  object-fit: contain;
+  border-radius: 8px;
+  display: block;
+  background: #111;
+}
+
+.videoMeta{
+  width:100%;
+  max-width:200px;
+  margin:4px auto 0;
+  font-size:12px;
+  color:#ff00ff;
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  line-height:1.2;
+}
+
+.videoDescription{
+  color:#fff;
+  font-size:13px;
+  word-break:break-word;
+  margin:0;
+}
+
+.videoStats{
+  opacity:0.7;
+  font-size:11px;
+  margin:0;
+}
+
+.likeButton{
+  background:none;
+  border:none;
+  color:#ff00ff;
+  font-size:14px;
+  padding:4px 0;
+  text-align:left;
+  cursor:pointer;
+}
+
+.viewerAdBar {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 320px;
+  min-height: 50px;
+  background: rgba(26, 26, 26, 0.95);
+  border: 1px dashed #888;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+  font-size: 0.85rem;
+  z-index: 1002;
+}
+
 /* PANTALLA COMPLETA / VIEWER GLOBAL */
 .viewer{
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;   /* Ocupa el 100% del ancho real de la pantalla */
-  height: 100vh;  /* Ocupa el 100% del alto real de la pantalla */
-  background: rgba(0, 0, 0, 0.95); /* Fondo negro cine */
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -133,13 +194,12 @@ button{
   box-sizing: border-box;
 }
 
-/* El video dentro de la pantalla completa (Laptop y Celular) */
 .viewer video{
   width: auto;
   height: auto;
-  max-width: 100%;   /* Se estira de forma inteligente al ancho máximo de la pantalla */
-  max-height: 100%;  /* Se estira de forma inteligente al alto máximo de la pantalla */
-  object-fit: contain; /* Clave: Mantiene la proporción exacta, si es horizontal o vertical se acopla sin deformarse */
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
   border-radius: 8px;
 }
 
@@ -149,38 +209,6 @@ button{
   object-fit:contain;
 }
 
-
-
-/* TARJETA DE VIDEO CON META-INFO */
-.videoCard{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-
-.videoMeta{
-  width:100%;
-  max-width:200px;
-  margin:6px 0 0;
-  font-size:12px;
-  color:#ff00ff;
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-}
-
-.videoDescription{
-  color:#fff;
-  font-size:13px;
-  word-break:break-word;
-}
-
-.videoStats{
-  opacity:0.7;
-  font-size:11px;
-}
-
-/* BOTÓN ELIMINAR (dentro del viewer a pantalla completa) */
 .deleteButton{
   position:absolute;
   bottom:30px;
@@ -193,7 +221,6 @@ button{
   font-weight:bold;
 }
 
-/* MODAL DE DESCRIPCIÓN ANTES DE SUBIR */
 .uploadModal{
   position:fixed;
   inset:0;
@@ -273,120 +300,6 @@ button{
   text-align:center;
 }
 
-.entriesCounter{
-  text-align:center;
-  color:#ff00ff;
-  font-size:13px;
-  margin:0 0 10px;
-  opacity:0.8;
-}
-
-.videoCard{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-
-.videoMeta{
-  width:100%;
-  max-width:200px;
-  margin:6px 0 0;
-  font-size:12px;
-  color:#ff00ff;
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-}
-
-.videoDescription{
-  color:#fff;
-  font-size:13px;
-  word-break:break-word;
-}
-
-.videoStats{
-  opacity:0.7;
-  font-size:11px;
-}
-
-.deleteButton{
-  position:absolute;
-  bottom:30px;
-  background:#ff0033;
-  color:white;
-  border:2px solid white;
-  padding:12px 24px;
-  border-radius:10px;
-  font-size:16px;
-  font-weight:bold;
-}
-
-.uploadModal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.85);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:2000;
-  padding:20px;
-}
-
-.uploadModalContent{
-  background:black;
-  border:2px solid #ff00ff;
-  border-radius:12px;
-  padding:20px;
-  width:100%;
-  max-width:320px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.uploadModalContent p{
-  color:#ff00ff;
-  margin:0;
-  font-size:14px;
-}
-
-.uploadModalContent textarea{
-  background:black;
-  color:#fff;
-  border:2px solid #ff00ff;
-  border-radius:8px;
-  padding:10px;
-  font-size:14px;
-  min-height:80px;
-  resize:none;
-  font-family:Arial,sans-serif;
-}
-
-.uploadModalButtons{
-  display:flex;
-  gap:10px;
-}
-
-.uploadModalButtons button{
-  flex:1;
-  background:black;
-  color:#ff00ff;
-  border:2px solid #ff00ff;
-  padding:10px;
-  border-radius:8px;
-  font-size:14px;
-}
-
-.likeButton{
-  background:none;
-  border:none;
-  color:#ff00ff;
-  font-size:14px;
-  padding:4px 0;
-  text-align:left;
-  cursor:pointer;
-}
-
 .navButton{
   position:fixed;
   top:50%;
@@ -417,7 +330,26 @@ button{
   margin:16px auto;
   font-size:16px;
   font-weight:bold;
-  grid-column:1 / -1;
   width:90%;
   display:block;
+}
+
+.closeButton {
+  position: absolute;
+  top: 80px; /* Cambia este número si quieres subirlo o bajarlo más */
+  right: 20px;
+  background: rgba(255, 0, 0, 0.9);
+  color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
