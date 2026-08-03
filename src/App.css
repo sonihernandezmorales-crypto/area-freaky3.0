@@ -9,9 +9,8 @@ body,
   width:100%;
   height:100%;
   background:black;
-  overflow:hidden;
+  overflow-y:auto;
   font-family:Arial,sans-serif;
-}
 
 .app{
   height:100vh;
