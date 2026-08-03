@@ -14,44 +14,6 @@ type MediaItem = {
 
 const API_URL = "https://169-58-72-43.sslip.io";
 
-const AD_EVERY_N_VIDEOS = 3;
-
-function AdsterraBanner() {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  useEffect(() => {
-    const iframe = iframeRef.current;
-    if (!iframe) return;
-    const doc = iframe.contentWindow?.document;
-    if (!doc) return;
-    doc.open();
-    doc.write(`
-      <script>
-        atOptions = {
-          'key' : '511a28e627e833ee00e252ff1bb3bf00',
-          'format' : 'iframe',
-          'height' : 250,
-          'width' : 300,
-          'params' : {}
-        };
-      </script>
-      <script src="https://www.highperformanceformat.com/511a28e627e833ee00e252ff1bb3bf00/invoke.js"></script>
-    `);
-    doc.close();
-  }, []);
-
-  return (
-    <iframe
-      ref={iframeRef}
-      title="adsterra-banner"
-      width="300"
-      height="250"
-      style={{ border: "none", overflow: "hidden" }}
-      scrolling="no"
-    />
-  );
-}
-
 function App() {
 
   const [videos, setVideos] = useState<MediaItem[]>([]);
@@ -98,16 +60,11 @@ function App() {
   };
 
   useEffect(() => {
-  loadMedia();
-  fetch(`${API_URL}/api/entry`, { method: "POST" })
-    .then(() => loadEntries())
-    .catch(() => {});
-
-  const script = document.createElement("script");
-  script.src = "https://pl30654580.effectivecpmnetwork.com/55/54/8a/55548a002c612a06552c0f75ef47ddb8.js";
-  script.async = true;
-  document.body.appendChild(script);
-}, []);
+    loadMedia();
+    fetch(`${API_URL}/api/entry`, { method: "POST" })
+      .then(() => loadEntries())
+      .catch(() => {});
+  }, []);
 
   const handleTitleClick = () => {
     const next = clickCount + 1;
@@ -354,12 +311,6 @@ function App() {
                 </button>
               </p>
             </div>
-
-            {(index + 1) % AD_EVERY_N_VIDEOS === 0 && (
-              <div className="adBanner adBannerInline">
-                <AdsterraBanner />
-              </div>
-            )}
           </div>
         ))}
 
@@ -371,7 +322,6 @@ function App() {
       {viewer && (
         <div className="viewer" onClick={() => setViewer(null)}>
 
-          {/* Botón de cerrar (X) en la esquina */}
           <button
             className="closeButton"
             onClick={() => setViewer(null)}
