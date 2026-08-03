@@ -77,17 +77,14 @@ button{
 /* ANUNCIO - más grande, tamaño tipo banner rectangular */
 .adBanner {
   width: 100%;
-  max-width: 320px;
-  min-height: 130px;
+  max-width: 300px;
+  min-height: 250px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #1a1a1a;
-  border: 1px dashed #555;
-  color: #888;
   margin: 8px auto;
-  font-size: 0.9rem;
   border-radius: 8px;
+  overflow: hidden;
 }
 
 /* VIDEOS - una sola columna, con scroll propio */
