@@ -14,12 +14,12 @@ type MediaItem = {
 
 const API_URL = "https://169-58-72-43.sslip.io";
 
-function AdsterraBanner() {
+function AdsterraAds() {
   const topBannerRef = useRef<HTMLDivElement>(null);
   const socialBarRef = useRef<HTMLDivElement>(null);
   const popunderRef = useRef<HTMLDivElement>(null);
 
-  // 1. Efecto para el banner de 320x50 (Arriba)
+  // 1. Banner Superior 320x50
   useEffect(() => {
     if (!topBannerRef.current) return;
     topBannerRef.current.innerHTML = "";
@@ -44,7 +44,7 @@ function AdsterraBanner() {
     topBannerRef.current.appendChild(invokeScript);
   }, []);
 
-  // 2. Efecto para el Social Bar (Flotante)
+  // 2. Social Bar
   useEffect(() => {
     if (!socialBarRef.current) return;
     socialBarRef.current.innerHTML = "";
@@ -57,7 +57,7 @@ function AdsterraBanner() {
     socialBarRef.current.appendChild(socialScript);
   }, []);
 
-  // 3. Efecto para el Popunder
+  // 3. Popunder
   useEffect(() => {
     if (!popunderRef.current) return;
     popunderRef.current.innerHTML = "";
@@ -85,14 +85,14 @@ function AdsterraBanner() {
         }}
       />
       
-      {/* Contenedores invisibles para el Social Bar y el Popunder */}
+      {/* Contenedores para Social Bar y Popunder */}
       <div ref={socialBarRef} />
       <div ref={popunderRef} />
     </>
   );
 }
 
-// Componente para el banner cuadrado 300x250 intercalado cada 3 videos
+// 4. Banner Cuadrado 300x250 intercalado cada 3 videos
 function InterstitialAdBox() {
   const adRef = useRef<HTMLDivElement>(null);
 
@@ -378,7 +378,7 @@ function App() {
   return (
     <div className="app">
 
-      <AdsterraBanner />
+      <AdsterraAds />
 
       <h1 onClick={handleTitleClick} className="appTitle">
         🔥 Ares Freaky 3.0 🔥 {isAdmin && "🔓"}
@@ -439,7 +439,7 @@ function App() {
                 </div>
               </div>
 
-              {/* Muestra el banner 300x250 cada 3 videos */}
+              {/* Banner 300x250 cada 3 videos */}
               {showAdAfter && <InterstitialAdBox />}
             </div>
           );
