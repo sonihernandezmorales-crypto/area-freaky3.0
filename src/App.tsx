@@ -14,12 +14,12 @@ type MediaItem = {
 
 const API_URL = "https://169-58-72-43.sslip.io";
 
-function AdsterraAds() {
+function AdsterraBanner() {
   const topBannerRef = useRef<HTMLDivElement>(null);
   const socialBarRef = useRef<HTMLDivElement>(null);
   const popunderRef = useRef<HTMLDivElement>(null);
 
-  // 1. Banner Superior 320x50
+  // 1. Efecto para el banner de 320x50 (Arriba)
   useEffect(() => {
     if (!topBannerRef.current) return;
     topBannerRef.current.innerHTML = "";
@@ -44,7 +44,7 @@ function AdsterraAds() {
     topBannerRef.current.appendChild(invokeScript);
   }, []);
 
-  // 2. Social Bar
+  // 2. Efecto para el Social Bar (Flotante)
   useEffect(() => {
     if (!socialBarRef.current) return;
     socialBarRef.current.innerHTML = "";
@@ -57,7 +57,7 @@ function AdsterraAds() {
     socialBarRef.current.appendChild(socialScript);
   }, []);
 
-  // 3. Popunder
+  // 3. Efecto para el Popunder
   useEffect(() => {
     if (!popunderRef.current) return;
     popunderRef.current.innerHTML = "";
@@ -85,53 +85,10 @@ function AdsterraAds() {
         }}
       />
       
-      {/* Contenedores para Social Bar y Popunder */}
+      {/* Contenedores invisibles para el Social Bar y el Popunder */}
       <div ref={socialBarRef} />
       <div ref={popunderRef} />
     </>
-  );
-}
-
-// 4. Banner Cuadrado 300x250 intercalado cada 3 videos
-function InterstitialAdBox() {
-  const adRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!adRef.current) return;
-    adRef.current.innerHTML = "";
-
-    const confScript = document.createElement("script");
-    confScript.type = "text/javascript";
-    confScript.innerHTML = `
-      atOptions = {
-        'key' : '511a28e627e833ee00e252ff1bb3bf00',
-        'format' : 'iframe',
-        'height' : 250,
-        'width' : 300,
-        'params' : {}
-      };
-    `;
-
-    const invokeScript = document.createElement("script");
-    invokeScript.type = "text/javascript";
-    invokeScript.src = "https://www.highperformanceformat.com/511a28e627e833ee00e252ff1bb3bf00/invoke.js";
-
-    adRef.current.appendChild(confScript);
-    adRef.current.appendChild(invokeScript);
-  }, []);
-
-  return (
-    <div
-      ref={adRef}
-      style={{
-        width: "300px",
-        height: "250px",
-        margin: "15px auto",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    />
   );
 }
 
@@ -378,7 +335,7 @@ function App() {
   return (
     <div className="app">
 
-      <AdsterraAds />
+      <AdsterraBanner />
 
       <h1 onClick={handleTitleClick} className="appTitle">
         🔥 Ares Freaky 3.0 🔥 {isAdmin && "🔓"}
@@ -413,37 +370,28 @@ function App() {
       )}
 
       <div className="videoSection">
-        {videos.map((video, index) => {
-          const showAdAfter = (index + 1) % 3 === 0;
+        {videos.map((video, index) => (
+          <div key={video.id} className="videoCardWrapper">
+            <div className="videoCard">
+              <video
+                src={video.url}
+                poster={video.thumbnail ? API_URL + video.thumbnail : undefined}
+                onClick={() => openViewer("video", video.url, video.id, index)}
+              />
 
-          return (
-            <div key={video.id} style={{ width: "100%" }}>
-              <div className="videoCardWrapper">
-                <div className="videoCard">
-                  <video
-                    src={video.url}
-                    poster={video.thumbnail ? API_URL + video.thumbnail : undefined}
-                    onClick={() => openViewer("video", video.url, video.id, index)}
-                  />
-
-                  <p className="videoMeta">
-                    {video.description && <span className="videoDescription">{video.description}</span>}
-                    <span className="videoStats">{video.date} · {video.views} vistas</span>
-                    <button
-                      className="likeButton"
-                      onClick={(e) => { e.stopPropagation(); likeMedia(video.id); }}
-                    >
-                      ❤️ {(video as any).likes || 0}
-                    </button>
-                  </p>
-                </div>
-              </div>
-
-              {/* Banner 300x250 cada 3 videos */}
-              {showAdAfter && <InterstitialAdBox />}
+              <p className="videoMeta">
+                {video.description && <span className="videoDescription">{video.description}</span>}
+                <span className="videoStats">{video.date} · {video.views} vistas</span>
+                <button
+                  className="likeButton"
+                  onClick={(e) => { e.stopPropagation(); likeMedia(video.id); }}
+                >
+                  ❤️ {(video as any).likes || 0}
+                </button>
+              </p>
             </div>
-          );
-        })}
+          </div>
+        ))}
 
         <button onClick={() => loadVideos(true)} className="loadMoreButton">
           Ver más videos
