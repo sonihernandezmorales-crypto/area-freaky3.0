@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 const VAST_URL = "https://s.magsrv.com/v1/vast.php?idz=5994186";
 const SKIP_AFTER_SECONDS = 5;
@@ -11,11 +11,15 @@ function VastAdPlayer({ onDone }: Props) {
   const [adUrl, setAdUrl] = useState<string | null>(null);
   const [canSkip, setCanSkip] = useState(false);
   const [checked, setChecked] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     fetch(VAST_URL)
-      .then((res) => res.text())
+      .then((res) => {
+        if (!res.ok) throw new Error("Error en la red al obtener VAST");
+        return res.text();
+      })
       .then((xmlText) => {
         const parser = new DOMParser();
         const xml = parser.parseFromString(xmlText, "text/xml");
@@ -25,15 +29,18 @@ function VastAdPlayer({ onDone }: Props) {
         if (url) {
           setAdUrl(url);
         } else {
-          onDone();
+          setErrorMsg("No hay anuncios disponibles (No-Fill)");
+          setTimeout(onDone, 1500); // Da tiempo a leer el mensaje
         }
         setChecked(true);
       })
-      .catch(() => {
-        onDone();
+      .catch((err) => {
+        console.error("Fallo VAST (posible CORS o bloqueo):", err);
+        setErrorMsg("Error cargando publicidad");
+        setTimeout(onDone, 1500);
         setChecked(true);
       });
-  }, []);
+  }, [onDone]);
 
   useEffect(() => {
     if (!adUrl) return;
@@ -41,8 +48,12 @@ function VastAdPlayer({ onDone }: Props) {
     return () => clearTimeout(timer);
   }, [adUrl]);
 
-  if (!checked || !adUrl) {
-    return null;
+  if (!checked) {
+    return <div style={{ color: "white", padding: "20px", textAlign: "center" }}>Cargando anuncio...</div>;
+  }
+
+  if (errorMsg || !adUrl) {
+    return <div style={{ color: "white", padding: "20px", textAlign: "center" }}>{errorMsg || "Saltando..."}</div>;
   }
 
   return (
@@ -52,8 +63,12 @@ function VastAdPlayer({ onDone }: Props) {
         src={adUrl}
         autoPlay
         playsInline
+        muted // ¡Importante para que Chrome no bloquee el autoplay!
         onEnded={onDone}
-        onError={onDone}
+        onError={() => {
+          console.error("Error reproduciendo el video del anuncio");
+          onDone();
+        }}
         style={{ width: "100%", maxHeight: "80vh" }}
       />
       {canSkip && (
