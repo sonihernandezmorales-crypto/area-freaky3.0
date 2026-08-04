@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import type { ChangeEvent } from "react";
 import "./App.css";
+import VastAdPlayer from "./VastAdPlayer";
 
 type MediaItem = {
   id: string;
@@ -18,6 +19,7 @@ function App() {
 
   const [videos, setVideos] = useState<MediaItem[]>([]);
   const [viewer, setViewer] = useState<{ type: "photo" | "video"; url: string; id: string; index: number } | null>(null);
+  const [showAd, setShowAd] = useState(false);
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [isAdmin, setIsAdmin] = useState(false);
   const [clickCount, setClickCount] = useState(0);
@@ -141,9 +143,10 @@ function App() {
   };
 
   const openViewer = (type: "photo" | "video", url: string, id: string, index: number) => {
-    setViewer({ type, url, id, index });
-    registerView(id);
-  };
+  setViewer({ type, url, id, index });
+  setShowAd(type === "video");
+  registerView(id);
+};
 
   const goToNext = () => {
     if (!viewer) return;
@@ -356,22 +359,26 @@ function App() {
           </button>
 
           {viewer.type === "photo" ? (
-            <img
-              src={viewer.url}
-              alt="gran vista"
-              onClick={(e) => e.stopPropagation()}
-            />
-          ) : (
-            <video
-              key={viewer.id}
-              src={viewer.url}
-              autoPlay
-              playsInline
-              controls
-              style={{ width: "100%", maxHeight: "80vh", objectFit: "contain" }}
-              onClick={(e) => e.stopPropagation()}
-            />
-          )}
+  <img
+    src={viewer.url}
+    alt="gran vista"
+    onClick={(e) => e.stopPropagation()}
+  />
+) : showAd ? (
+  <div onClick={(e) => e.stopPropagation()}>
+    <VastAdPlayer onDone={() => setShowAd(false)} />
+  </div>
+) : (
+  <video
+    key={viewer.id}
+    src={viewer.url}
+    autoPlay
+    playsInline
+    controls
+    style={{ width: "100%", maxHeight: "80vh", objectFit: "contain" }}
+    onClick={(e) => e.stopPropagation()}
+  />
+)}
             
           <button
             className="navButton navRight"
