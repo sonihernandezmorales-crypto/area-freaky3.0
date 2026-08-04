@@ -111,8 +111,10 @@ function App() {
 
   const PAGE_SIZE = 15;
 
-  // Suma en tiempo real el campo "views" de todos los videos cargados
-  const totalViews = videos.reduce((acc, video) => acc + (video.views || 0), 0);
+  // Suma exacta y limpia usando IDs únicos para evitar que se infle el número
+  const totalViews = Array.from(
+    new Map(videos.map(video => [video.id, video])).values()
+  ).reduce((acc, video) => acc + (video.views || 0), 0);
 
   const loadVideos = async (append: boolean) => {
     try {

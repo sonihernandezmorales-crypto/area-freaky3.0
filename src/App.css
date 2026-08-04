@@ -11,6 +11,16 @@ body,
   background:black;
   overflow-y:auto;
   font-family:Arial,sans-serif;
+} /* <-- AQUÍ FALTABA ESTA LLAVE QUE TRABABA EL SCROLL */
+
+.app{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:black;
+  color:#ff00ff;
+  padding: 8px 15px 15px;
+}
 
 .app{
   height:100vh;
