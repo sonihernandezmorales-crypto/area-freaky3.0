@@ -15,10 +15,13 @@ type MediaItem = {
 const API_URL = "https://169-58-72-43.sslip.io";
 
 function AdsterraBanner() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const topBannerRef = useRef<HTMLDivElement>(null);
+  const socialBarRef = useRef<HTMLDivElement>(null);
 
+  // 1. Efecto para el banner de 320x50 (Arriba)
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!topBannerRef.current) return;
+    topBannerRef.current.innerHTML = "";
 
     const confScript = document.createElement("script");
     confScript.type = "text/javascript";
@@ -36,22 +39,41 @@ function AdsterraBanner() {
     invokeScript.type = "text/javascript";
     invokeScript.src = "https://www.highperformanceformat.com/64b118f05af36d35bec3887dd8b21a14/invoke.js";
 
-    containerRef.current.appendChild(confScript);
-    containerRef.current.appendChild(invokeScript);
+    topBannerRef.current.appendChild(confScript);
+    topBannerRef.current.appendChild(invokeScript);
+  }, []);
+
+  // 2. Efecto para el nuevo Social Bar (Flotante)
+  useEffect(() => {
+    if (!socialBarRef.current) return;
+    socialBarRef.current.innerHTML = "";
+
+    const socialScript = document.createElement("script");
+    socialScript.type = "text/javascript";
+    socialScript.src = "https://pl30654580.effectivecpmnetwork.com/55/54/8a/55548a002c612a06552c0f75ef47ddb8.js";
+    socialScript.async = true;
+
+    socialBarRef.current.appendChild(socialScript);
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        width: "320px",
-        height: "50px",
-        margin: "0 auto",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    />
+    <>
+      {/* Banner 320x50 fijo arriba */}
+      <div
+        ref={topBannerRef}
+        style={{
+          width: "320px",
+          height: "50px",
+          margin: "0 auto",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      />
+      
+      {/* Contenedor invisible para el Social Bar */}
+      <div ref={socialBarRef} />
+    </>
   );
 }
 
@@ -308,7 +330,6 @@ function App() {
         Un mundo sin límites
       </p>
 
-
       {isAdmin && (
         <p className="entriesCounter">
           Entradas totales: {entries}
@@ -389,7 +410,6 @@ function App() {
           >
             ✕
           </button>
-
 
           <button
             className="navButton navLeft"
