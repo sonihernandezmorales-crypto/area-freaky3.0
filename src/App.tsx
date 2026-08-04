@@ -92,6 +92,49 @@ function AdsterraBanner() {
   );
 }
 
+// Componente para el banner cuadrado 300x250 intercalado cada 3 videos
+function InterstitialAdBox() {
+  const adRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!adRef.current) return;
+    adRef.current.innerHTML = "";
+
+    const confScript = document.createElement("script");
+    confScript.type = "text/javascript";
+    confScript.innerHTML = `
+      atOptions = {
+        'key' : '511a28e627e833ee00e252ff1bb3bf00',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+    `;
+
+    const invokeScript = document.createElement("script");
+    invokeScript.type = "text/javascript";
+    invokeScript.src = "https://www.highperformanceformat.com/511a28e627e833ee00e252ff1bb3bf00/invoke.js";
+
+    adRef.current.appendChild(confScript);
+    adRef.current.appendChild(invokeScript);
+  }, []);
+
+  return (
+    <div
+      ref={adRef}
+      style={{
+        width: "300px",
+        height: "250px",
+        margin: "15px auto",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    />
+  );
+}
+
 function App() {
 
   const [videos, setVideos] = useState<MediaItem[]>([]);
@@ -370,28 +413,37 @@ function App() {
       )}
 
       <div className="videoSection">
-        {videos.map((video, index) => (
-          <div key={video.id} className="videoCardWrapper">
-            <div className="videoCard">
-              <video
-                src={video.url}
-                poster={video.thumbnail ? API_URL + video.thumbnail : undefined}
-                onClick={() => openViewer("video", video.url, video.id, index)}
-              />
+        {videos.map((video, index) => {
+          const showAdAfter = (index + 1) % 3 === 0;
 
-              <p className="videoMeta">
-                {video.description && <span className="videoDescription">{video.description}</span>}
-                <span className="videoStats">{video.date} · {video.views} vistas</span>
-                <button
-                  className="likeButton"
-                  onClick={(e) => { e.stopPropagation(); likeMedia(video.id); }}
-                >
-                  ❤️ {(video as any).likes || 0}
-                </button>
-              </p>
+          return (
+            <div key={video.id} style={{ width: "100%" }}>
+              <div className="videoCardWrapper">
+                <div className="videoCard">
+                  <video
+                    src={video.url}
+                    poster={video.thumbnail ? API_URL + video.thumbnail : undefined}
+                    onClick={() => openViewer("video", video.url, video.id, index)}
+                  />
+
+                  <p className="videoMeta">
+                    {video.description && <span className="videoDescription">{video.description}</span>}
+                    <span className="videoStats">{video.date} · {video.views} vistas</span>
+                    <button
+                      className="likeButton"
+                      onClick={(e) => { e.stopPropagation(); likeMedia(video.id); }}
+                    >
+                      ❤️ {(video as any).likes || 0}
+                    </button>
+                  </p>
+                </div>
+              </div>
+
+              {/* Muestra el banner 300x250 cada 3 videos */}
+              {showAdAfter && <InterstitialAdBox />}
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         <button onClick={() => loadVideos(true)} className="loadMoreButton">
           Ver más videos
