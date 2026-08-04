@@ -17,6 +17,7 @@ const API_URL = "https://169-58-72-43.sslip.io";
 function AdsterraBanner() {
   const topBannerRef = useRef<HTMLDivElement>(null);
   const socialBarRef = useRef<HTMLDivElement>(null);
+  const popunderRef = useRef<HTMLDivElement>(null);
 
   // 1. Efecto para el banner de 320x50 (Arriba)
   useEffect(() => {
@@ -43,7 +44,7 @@ function AdsterraBanner() {
     topBannerRef.current.appendChild(invokeScript);
   }, []);
 
-  // 2. Efecto para el nuevo Social Bar (Flotante)
+  // 2. Efecto para el Social Bar (Flotante)
   useEffect(() => {
     if (!socialBarRef.current) return;
     socialBarRef.current.innerHTML = "";
@@ -54,6 +55,19 @@ function AdsterraBanner() {
     socialScript.async = true;
 
     socialBarRef.current.appendChild(socialScript);
+  }, []);
+
+  // 3. Efecto para el Popunder
+  useEffect(() => {
+    if (!popunderRef.current) return;
+    popunderRef.current.innerHTML = "";
+
+    const popunderScript = document.createElement("script");
+    popunderScript.type = "text/javascript";
+    popunderScript.src = "https://pl30687192.effectivecpmnetwork.com/65/f7/8a/65f78a129e74b4bc6d131eb82285a8e9.js";
+    popunderScript.async = true;
+
+    popunderRef.current.appendChild(popunderScript);
   }, []);
 
   return (
@@ -71,8 +85,9 @@ function AdsterraBanner() {
         }}
       />
       
-      {/* Contenedor invisible para el Social Bar */}
+      {/* Contenedores invisibles para el Social Bar y el Popunder */}
       <div ref={socialBarRef} />
+      <div ref={popunderRef} />
     </>
   );
 }
