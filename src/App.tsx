@@ -268,15 +268,18 @@ function App() {
 
       if (!res.ok) {
         alert(data.error || "Error al subir");
+        setIsUploading(false); // <-- Asegurar que se libere si falla
         return;
       }
 
+      setPendingFile(null);
+      setDescriptionInput("");
       loadMedia();
     } catch (err) {
       console.error("Error subiendo archivo:", err);
       alert("Error de conexión con el servidor");
     } finally {
-      setIsUploading(false);
+      setIsUploading(false); // <-- Libera el estado pase lo que pase
     }
   };
 
