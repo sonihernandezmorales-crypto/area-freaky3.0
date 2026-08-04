@@ -10,7 +10,7 @@ type Props = {
 function VastAdPlayer({ onDone }: Props) {
   const [adUrl, setAdUrl] = useState<string | null>(null);
   const [canSkip, setCanSkip] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [checked, setChecked] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -25,10 +25,14 @@ function VastAdPlayer({ onDone }: Props) {
         if (url) {
           setAdUrl(url);
         } else {
-          setFailed(true);
+          onDone();
         }
+        setChecked(true);
       })
-      .catch(() => setFailed(true));
+      .catch(() => {
+        onDone();
+        setChecked(true);
+      });
   }, []);
 
   useEffect(() => {
@@ -37,17 +41,8 @@ function VastAdPlayer({ onDone }: Props) {
     return () => clearTimeout(timer);
   }, [adUrl]);
 
-  if (failed) {
-    onDone();
+  if (!checked || !adUrl) {
     return null;
-  }
-
-  if (!adUrl) {
-    return (
-      <div style={{ color: "white", textAlign: "center", padding: "40px" }}>
-        Cargando anuncio...
-      </div>
-    );
   }
 
   return (
