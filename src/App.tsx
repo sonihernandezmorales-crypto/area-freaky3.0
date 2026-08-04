@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import type { ChangeEvent } from "react";
 import "./App.css";
-import VastAdPlayer from "./VastAdPlayer";
 
 type MediaItem = {
   id: string;
@@ -15,11 +14,51 @@ type MediaItem = {
 
 const API_URL = "https://169-58-72-43.sslip.io";
 
+function AdsterraBanner() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const confScript = document.createElement("script");
+    confScript.type = "text/javascript";
+    confScript.innerHTML = `
+      atOptions = {
+        'key' : '64b118f05af36d35bec3887dd8b21a14',
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
+      };
+    `;
+
+    const invokeScript = document.createElement("script");
+    invokeScript.type = "text/javascript";
+    invokeScript.src = "https://www.highperformanceformat.com/64b118f05af36d35bec3887dd8b21a14/invoke.js";
+
+    containerRef.current.appendChild(confScript);
+    containerRef.current.appendChild(invokeScript);
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        width: "320px",
+        height: "50px",
+        margin: "0 auto",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    />
+  );
+}
+
 function App() {
 
   const [videos, setVideos] = useState<MediaItem[]>([]);
   const [viewer, setViewer] = useState<{ type: "photo" | "video"; url: string; id: string; index: number } | null>(null);
-  const [showAd, setShowAd] = useState(false);
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [isAdmin, setIsAdmin] = useState(false);
   const [clickCount, setClickCount] = useState(0);
@@ -143,10 +182,9 @@ function App() {
   };
 
   const openViewer = (type: "photo" | "video", url: string, id: string, index: number) => {
-  setViewer({ type, url, id, index });
-  setShowAd(type === "video");
-  registerView(id);
-};
+    setViewer({ type, url, id, index });
+    registerView(id);
+  };
 
   const goToNext = () => {
     if (!viewer) return;
@@ -260,6 +298,8 @@ function App() {
   return (
     <div className="app">
 
+      <AdsterraBanner />
+
       <h1 onClick={handleTitleClick} className="appTitle">
         🔥 Ares Freaky 3.0 🔥 {isAdmin && "🔓"}
       </h1>
@@ -359,27 +399,23 @@ function App() {
           </button>
 
           {viewer.type === "photo" ? (
-  <img
-    src={viewer.url}
-    alt="gran vista"
-    onClick={(e) => e.stopPropagation()}
-  />
-) : showAd ? (
-  <div onClick={(e) => e.stopPropagation()}>
-    <VastAdPlayer onDone={() => setShowAd(false)} />
-  </div>
-) : (
-  <video
-    key={viewer.id}
-    src={viewer.url}
-    autoPlay
-    playsInline
-    controls
-    style={{ width: "100%", maxHeight: "80vh", objectFit: "contain" }}
-    onClick={(e) => e.stopPropagation()}
-  />
-)}
-            
+            <img
+              src={viewer.url}
+              alt="gran vista"
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <video
+              key={viewer.id}
+              src={viewer.url}
+              autoPlay
+              playsInline
+              controls
+              style={{ width: "100%", maxHeight: "80vh", objectFit: "contain" }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
+
           <button
             className="navButton navRight"
             onClick={(e) => { e.stopPropagation(); goToNext(); }}
