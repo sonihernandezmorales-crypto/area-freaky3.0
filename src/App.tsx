@@ -14,12 +14,12 @@ type MediaItem = {
 
 const API_URL = "https://169-58-72-43.sslip.io";
 
-function AdsterraBanner() {
+function AdsterraAds() {
   const topBannerRef = useRef<HTMLDivElement>(null);
   const socialBarRef = useRef<HTMLDivElement>(null);
   const popunderRef = useRef<HTMLDivElement>(null);
 
-  // 1. Efecto para el banner de 320x50 (Arriba)
+  // 1. Banner Superior 320x50
   useEffect(() => {
     if (!topBannerRef.current) return;
     topBannerRef.current.innerHTML = "";
@@ -44,7 +44,7 @@ function AdsterraBanner() {
     topBannerRef.current.appendChild(invokeScript);
   }, []);
 
-  // 2. Efecto para el Social Bar (Flotante)
+  // 2. Social Bar
   useEffect(() => {
     if (!socialBarRef.current) return;
     socialBarRef.current.innerHTML = "";
@@ -57,7 +57,7 @@ function AdsterraBanner() {
     socialBarRef.current.appendChild(socialScript);
   }, []);
 
-  // 3. Efecto para el Popunder
+  // 3. Popunder
   useEffect(() => {
     if (!popunderRef.current) return;
     popunderRef.current.innerHTML = "";
@@ -85,7 +85,7 @@ function AdsterraBanner() {
         }}
       />
       
-      {/* Contenedores invisibles para el Social Bar y el Popunder */}
+      {/* Contenedores para Social Bar y Popunder */}
       <div ref={socialBarRef} />
       <div ref={popunderRef} />
     </>
@@ -110,6 +110,9 @@ function App() {
   const videoInput = useRef<HTMLInputElement>(null);
 
   const PAGE_SIZE = 15;
+
+  // Suma en tiempo real el campo "views" de todos los videos cargados
+  const totalViews = videos.reduce((acc, video) => acc + (video.views || 0), 0);
 
   const loadVideos = async (append: boolean) => {
     try {
@@ -190,6 +193,10 @@ function App() {
   const registerView = async (id: string) => {
     try {
       await fetch(`${API_URL}/api/media/${id}/view`, { method: "POST" });
+      // Actualiza localmente el contador de vistas al instante sin retraso
+      setVideos((prevVideos) =>
+        prevVideos.map((v) => (v.id === id ? { ...v, views: v.views + 1 } : v))
+      );
     } catch (err) {
       console.error("Error registrando vista:", err);
     }
@@ -335,7 +342,7 @@ function App() {
   return (
     <div className="app">
 
-      <AdsterraBanner />
+      <AdsterraAds />
 
       <h1 onClick={handleTitleClick} className="appTitle">
         🔥 Ares Freaky 3.0 🔥 {isAdmin && "🔓"}
@@ -346,9 +353,10 @@ function App() {
       </p>
 
       {isAdmin && (
-        <p className="entriesCounter">
-          Entradas totales: {entries}
-        </p>
+        <div style={{ margin: "10px 0", color: "#fff", background: "rgba(0,0,0,0.5)", padding: "10px", borderRadius: "8px", display: "inline-block" }}>
+          <p style={{ margin: "2px 0" }}>Entradas totales: {entries}</p>
+          <p style={{ margin: "2px 0" }}>Vistas generales acumuladas: {totalViews}</p>
+        </div>
       )}
 
       {isAdmin && (
@@ -371,24 +379,26 @@ function App() {
 
       <div className="videoSection">
         {videos.map((video, index) => (
-          <div key={video.id} className="videoCardWrapper">
-            <div className="videoCard">
-              <video
-                src={video.url}
-                poster={video.thumbnail ? API_URL + video.thumbnail : undefined}
-                onClick={() => openViewer("video", video.url, video.id, index)}
-              />
+          <div key={video.id} style={{ width: "100%" }}>
+            <div className="videoCardWrapper">
+              <div className="videoCard">
+                <video
+                  src={video.url}
+                  poster={video.thumbnail ? API_URL + video.thumbnail : undefined}
+                  onClick={() => openViewer("video", video.url, video.id, index)}
+                />
 
-              <p className="videoMeta">
-                {video.description && <span className="videoDescription">{video.description}</span>}
-                <span className="videoStats">{video.date} · {video.views} vistas</span>
-                <button
-                  className="likeButton"
-                  onClick={(e) => { e.stopPropagation(); likeMedia(video.id); }}
-                >
-                  ❤️ {(video as any).likes || 0}
-                </button>
-              </p>
+                <p className="videoMeta">
+                  {video.description && <span className="videoDescription">{video.description}</span>}
+                  <span className="videoStats">{video.date} · {video.views} vistas</span>
+                  <button
+                    className="likeButton"
+                    onClick={(e) => { e.stopPropagation(); likeMedia(video.id); }}
+                  >
+                    ❤️ {(video as any).likes || 0}
+                  </button>
+                </p>
+              </div>
             </div>
           </div>
         ))}
