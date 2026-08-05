@@ -106,6 +106,7 @@ function App() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
 
   const videoInput = useRef<HTMLInputElement>(null);
 
@@ -246,6 +247,9 @@ function App() {
 
   const uploadFile = async (file: File, description: string) => {
     if (isUploading) return;
+    
+    const controller = new AbortController();
+    setAbortController(controller);
     setIsUploading(true);
 
     const formData = new FormData();
@@ -256,6 +260,7 @@ function App() {
       const res = await fetch(`${API_URL}/api/upload`, {
         method: "POST",
         body: formData,
+        signal: controller.signal,
       });
 
       const data = await res.json();
@@ -268,11 +273,16 @@ function App() {
       setPendingFile(null);
       setDescriptionInput("");
       loadMedia();
-    } catch (err) {
-      console.error("Error subiendo archivo:", err);
-      alert("Error de conexión con el servidor");
+    } catch (err: any) {
+      if (err.name === "AbortError") {
+        console.log("Subida cancelada por el usuario");
+      } else {
+        console.error("Error subiendo archivo:", err);
+        alert("Error de conexión con el servidor");
+      }
     } finally {
       setIsUploading(false);
+      setAbortController(null);
     }
   };
 
@@ -294,9 +304,13 @@ function App() {
   };
 
   const cancelUpload = () => {
-    if (isUploading) return;
+    if (abortController) {
+      abortController.abort();
+    }
     setPendingFile(null);
     setDescriptionInput("");
+    setIsUploading(false);
+    setAbortController(null);
   };
 
   const deleteMedia = async (id: string) => {
@@ -496,7 +510,7 @@ function App() {
               <button onClick={confirmUpload} disabled={isUploading}>
                 {isUploading ? "Subiendo..." : "Subir"}
               </button>
-              <button onClick={cancelUpload} disabled={isUploading}>Cancelar</button>
+              <button onClick={cancelUpload}>Cancelar</button>
             </div>
           </div>
         </div>
