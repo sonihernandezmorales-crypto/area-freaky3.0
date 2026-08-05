@@ -14,84 +14,6 @@ type MediaItem = {
 
 const API_URL = "https://169-58-72-43.sslip.io";
 
-function AdsterraAds() {
-  const topBannerRef = useRef<HTMLDivElement>(null);
-  const socialBarRef = useRef<HTMLDivElement>(null);
-  const popunderRef = useRef<HTMLDivElement>(null);
-
-  // 1. Banner Superior 320x50
-  useEffect(() => {
-    if (!topBannerRef.current) return;
-    topBannerRef.current.innerHTML = "";
-
-    const confScript = document.createElement("script");
-    confScript.type = "text/javascript";
-    confScript.innerHTML = `
-      atOptions = {
-        'key' : '64b118f05af36d35bec3887dd8b21a14',
-        'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
-        'params' : {}
-      };
-    `;
-
-    const invokeScript = document.createElement("script");
-    invokeScript.type = "text/javascript";
-    invokeScript.src = "https://www.highperformanceformat.com/64b118f05af36d35bec3887dd8b21a14/invoke.js";
-
-    topBannerRef.current.appendChild(confScript);
-    topBannerRef.current.appendChild(invokeScript);
-  }, []);
-
-  // 2. Social Bar
-  useEffect(() => {
-    if (!socialBarRef.current) return;
-    socialBarRef.current.innerHTML = "";
-
-    const socialScript = document.createElement("script");
-    socialScript.type = "text/javascript";
-    socialScript.src = "https://pl30654580.effectivecpmnetwork.com/55/54/8a/55548a002c612a06552c0f75ef47ddb8.js";
-    socialScript.async = true;
-
-    socialBarRef.current.appendChild(socialScript);
-  }, []);
-
-  // 3. Popunder
-  useEffect(() => {
-    if (!popunderRef.current) return;
-    popunderRef.current.innerHTML = "";
-
-    const popunderScript = document.createElement("script");
-    popunderScript.type = "text/javascript";
-    popunderScript.src = "https://pl30687192.effectivecpmnetwork.com/65/f7/8a/65f78a129e74b4bc6d131eb82285a8e9.js";
-    popunderScript.async = true;
-
-    popunderRef.current.appendChild(popunderScript);
-  }, []);
-
-  return (
-    <>
-      {/* Banner 320x50 fijo arriba */}
-      <div
-        ref={topBannerRef}
-        style={{
-          width: "320px",
-          height: "50px",
-          margin: "0 auto",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      />
-      
-      {/* Contenedores para Social Bar y Popunder */}
-      <div ref={socialBarRef} />
-      <div ref={popunderRef} />
-    </>
-  );
-}
-
 function App() {
 
   const [videos, setVideos] = useState<MediaItem[]>([]);
@@ -106,11 +28,14 @@ function App() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [abortController, setAbortController] = useState<AbortController | null>(null);
 
   const videoInput = useRef<HTMLInputElement>(null);
 
   const PAGE_SIZE = 15;
+
+  const totalViews = Array.from(
+    new Map(videos.map(video => [video.id, video])).values()
+  ).reduce((acc, video) => acc + (video.views || 0), 0);
 
   const loadVideos = async (append: boolean) => {
     try {
@@ -247,9 +172,6 @@ function App() {
 
   const uploadFile = async (file: File, description: string) => {
     if (isUploading) return;
-    
-    const controller = new AbortController();
-    setAbortController(controller);
     setIsUploading(true);
 
     const formData = new FormData();
@@ -260,29 +182,24 @@ function App() {
       const res = await fetch(`${API_URL}/api/upload`, {
         method: "POST",
         body: formData,
-        signal: controller.signal,
       });
 
       const data = await res.json();
 
       if (!res.ok) {
         alert(data.error || "Error al subir");
+        setIsUploading(false);
         return;
       }
 
       setPendingFile(null);
       setDescriptionInput("");
       loadMedia();
-    } catch (err: any) {
-      if (err.name === "AbortError") {
-        console.log("Subida cancelada por el usuario");
-      } else {
-        console.error("Error subiendo archivo:", err);
-        alert("Error de conexión con el servidor");
-      }
+    } catch (err) {
+      console.error("Error subiendo archivo:", err);
+      alert("Error de conexión con el servidor");
     } finally {
       setIsUploading(false);
-      setAbortController(null);
     }
   };
 
@@ -304,13 +221,9 @@ function App() {
   };
 
   const cancelUpload = () => {
-    if (abortController) {
-      abortController.abort();
-    }
+    if (isUploading) return;
     setPendingFile(null);
     setDescriptionInput("");
-    setIsUploading(false);
-    setAbortController(null);
   };
 
   const deleteMedia = async (id: string) => {
@@ -354,8 +267,6 @@ function App() {
   return (
     <div className="app">
 
-      <AdsterraAds />
-
       <h1 onClick={handleTitleClick} className="appTitle">
         🔥 Ares Freaky 3.0 🔥 {isAdmin && "🔓"}
       </h1>
@@ -367,6 +278,7 @@ function App() {
       {isAdmin && (
         <div style={{ margin: "10px 0", color: "#fff", background: "rgba(0,0,0,0.5)", padding: "10px", borderRadius: "8px", display: "inline-block" }}>
           <p style={{ margin: "2px 0" }}>Entradas totales: {entries}</p>
+          <p style={{ margin: "2px 0" }}>Vistas generales acumuladas: {totalViews}</p>
         </div>
       )}
 
@@ -510,7 +422,7 @@ function App() {
               <button onClick={confirmUpload} disabled={isUploading}>
                 {isUploading ? "Subiendo..." : "Subir"}
               </button>
-              <button onClick={cancelUpload}>Cancelar</button>
+              <button onClick={cancelUpload} disabled={isUploading}>Cancelar</button>
             </div>
           </div>
         </div>
