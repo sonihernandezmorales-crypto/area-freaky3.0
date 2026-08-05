@@ -278,7 +278,6 @@ function App() {
       {isAdmin && (
         <div style={{ margin: "10px 0", color: "#fff", background: "rgba(0,0,0,0.5)", padding: "10px", borderRadius: "8px", display: "inline-block" }}>
           <p style={{ margin: "2px 0" }}>Entradas totales: {entries}</p>
-          <p style={{ margin: "2px 0" }}>Vistas generales acumuladas: {totalViews}</p>
         </div>
       )}
 
