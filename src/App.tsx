@@ -111,11 +111,6 @@ function App() {
 
   const PAGE_SIZE = 15;
 
-  // Suma exacta y limpia usando IDs únicos para evitar que se infle el número
-  const totalViews = Array.from(
-    new Map(videos.map(video => [video.id, video])).values()
-  ).reduce((acc, video) => acc + (video.views || 0), 0);
-
   const loadVideos = async (append: boolean) => {
     try {
       const offset = append ? videos.length : 0;
@@ -195,7 +190,6 @@ function App() {
   const registerView = async (id: string) => {
     try {
       await fetch(`${API_URL}/api/media/${id}/view`, { method: "POST" });
-      // Actualiza localmente el contador de vistas al instante sin retraso
       setVideos((prevVideos) =>
         prevVideos.map((v) => (v.id === id ? { ...v, views: v.views + 1 } : v))
       );
@@ -268,7 +262,6 @@ function App() {
 
       if (!res.ok) {
         alert(data.error || "Error al subir");
-        setIsUploading(false); // <-- Asegurar que se libere si falla
         return;
       }
 
@@ -279,7 +272,7 @@ function App() {
       console.error("Error subiendo archivo:", err);
       alert("Error de conexión con el servidor");
     } finally {
-      setIsUploading(false); // <-- Libera el estado pase lo que pase
+      setIsUploading(false);
     }
   };
 
@@ -360,7 +353,6 @@ function App() {
       {isAdmin && (
         <div style={{ margin: "10px 0", color: "#fff", background: "rgba(0,0,0,0.5)", padding: "10px", borderRadius: "8px", display: "inline-block" }}>
           <p style={{ margin: "2px 0" }}>Entradas totales: {entries}</p>
-          <p style={{ margin: "2px 0" }}>Vistas generales acumuladas: {totalViews}</p>
         </div>
       )}
 
