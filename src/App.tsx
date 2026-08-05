@@ -33,10 +33,6 @@ function App() {
 
   const PAGE_SIZE = 15;
 
-  const totalViews = Array.from(
-    new Map(videos.map(video => [video.id, video])).values()
-  ).reduce((acc, video) => acc + (video.views || 0), 0);
-
   const loadVideos = async (append: boolean) => {
     try {
       const offset = append ? videos.length : 0;
